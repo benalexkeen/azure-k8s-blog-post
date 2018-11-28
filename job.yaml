@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: temperature-job
+spec:
+  parallelism: 3
+  template:
+    metadata:
+      name: temperature-job
+    spec:
+      containers:
+      - name: c
+        image: redisqueuecontainerregistry.azurecr.io/aggregate-temperature
+        env:
+        - name: AZURE_CREDENTIALS_PATH
+          value: /var/secrets/azure/azure_credentials.json
+        volumeMounts:
+        - name: azure-credentials
+          mountPath: "/var/secrets/azure"
+          readOnly: true
+      volumes:
+      - name: azure-credentials
+        secret:
+          secretName: azure-credentials
+      restartPolicy: OnFailure
